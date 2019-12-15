@@ -14,11 +14,9 @@ export = {
                     res.status(404).json(error);
                 } else {
                     if (collections) {
-                        res.status(200).json({
-                            collections: collections.map((collection: Collection<any>) => {
-                                return collection.collectionName
-                            })
-                        });
+                        res.status(200).json(collections.map((collection: Collection<any>) => {
+                            return collection.collectionName
+                        }));
                     } else {
                         res.status(404).json({
                             message: 'Collections not found'
@@ -34,9 +32,7 @@ export = {
             collection.find().toArray((error: ServerError, documents: Array<any>) => {
                 connection.close();
                 if (documents) {
-                    res.status(200).json({
-                        documents: documents
-                    });
+                    res.status(200).json(documents);
                 } else {
                     res.status(404).json({
                         message: 'Documents not found'
