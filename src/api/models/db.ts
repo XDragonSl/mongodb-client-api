@@ -1,29 +1,13 @@
 import mongoose = require('mongoose');
 
-const URI = process.env.DB_URI;
-
-mongoose.connect(URI, {useNewUrlParser: true});
-
-function shutdown(callback: Function) {
-    mongoose.connection.close(() => {
-        callback();
+function DBConnect(uri: string, callback: any) {
+    let connection = mongoose.createConnection(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+    connection.on('connected', () => {
+        callback(connection);
     });
 }
 
-process.once('SIGUSR2', () => {
-    shutdown(() => {
-        process.kill(process.pid, 'SIGUSR2');
-    });
-});
-
-process.on('SIGINT', () => {
-    shutdown(() => {
-        process.exit();
-    });
-});
-
-process.on('SIGTERM', () => {
-    shutdown(() => {
-        process.exit();
-    });
-});
+export default DBConnect;

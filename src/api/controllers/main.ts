@@ -1,16 +1,13 @@
-import mongoose = require('mongoose');
+import DBConnect from '../models/db'
 
+import { Connection } from 'mongoose'
 import { MongoError, Collection } from 'mongodb'
 import { Request, Response, NextFunction } from 'express';
 import { ServerError } from '../../types/error';
 
 export = {
     collections: (req: Request, res: Response, next: NextFunction) => {
-        let connection = mongoose.createConnection(req.body.uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-        connection.on('connected', () => {
+        DBConnect(req.body.uri, (connection: Connection) => {
             connection.db.collections((error: MongoError, collections: Array<Collection<any>>) => {
                 connection.close();
                 if (error) {
@@ -29,14 +26,10 @@ export = {
                     }
                 }
             });
-        });
+        })
     },
     documents: (req: Request, res: Response, next: NextFunction) => {
-        let connection = mongoose.createConnection(req.body.uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-        connection.on('connected', () => {
+        DBConnect(req.body.uri, (connection: Connection) => {
             let collection = connection.db.collection(req.body.collection);
             collection.find().toArray((error: ServerError, documents: Array<any>) => {
                 connection.close();
@@ -50,6 +43,6 @@ export = {
                     });
                 }
             });
-        });
+        })
     }
 };
